@@ -1,0 +1,32 @@
+name: Deploy to DigitalOcean Droplet
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checking out the repository
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Building and Pushing Docker image
+      run: docker build -t trofimov/summvideo:latest .
+
+    - name: Deploying on Droplet
+      run: |
+        ssh root@167.172.164.66 << 'EOF'
+          cd /var/www/myapp
+          git pull origin main
+          docker-compose down
+          docker-compose up -d --build
+        EOF
