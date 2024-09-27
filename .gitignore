@@ -1,0 +1,39 @@
+# Игнорирование файлов среды разработки
+.vscode/
+.idea/
+__pycache__/
+*.pyc
+*.pyo
+
+# Игнорирование окружения Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Игнорирование файлов Docker
+.dockerignore
+docker-compose.override.yml
+
+# Игнорирование переменных окружения
+.env
+.env.*
+
+# Игнорирование логов
+*.log
+logs/
+
+# Игнорирование временных файлов и кэшей
+*.swp
+*.swo
+*.swn
+*.DS_Store
+*.tmp
+*.bak
+*.backup
+*.old
+
+# Игнорирование файлов и папок, созданных системой или редактором
+Thumbs.db
+.DS_Store

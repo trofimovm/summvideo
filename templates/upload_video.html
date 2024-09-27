@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Загрузка видео для саммари</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@12.2.0/dist/markdown-it.min.js"></script>
+    <script>
+        async function uploadVideo(event) {
+            event.preventDefault();
+
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            const submitButton = document.querySelector('button[type="submit"]');
+
+            // Отключаем кнопку отправки
+            submitButton.disabled = true;
+            submitButton.textContent = 'Обработка...';
+
+            // Показываем прелоудер и сообщение
+            document.getElementById('loader').style.display = 'block';
+            document.getElementById('processing-message').style.display = 'block';
+            document.getElementById('result').innerHTML = '';
+
+            try {
+                const response = await fetch('/upload_video/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки видео');
+                }
+
+                const result = await response.json();
+                
+                // Преобразуем Markdown в HTML
+                const md = window.markdownit({
+                    html: true, // разрешаем HTML внутри Markdown
+                    linkify: true, // автоформатируем ссылки
+                    typographer: true // используем типограф
+                });
+                const htmlContent = md.render(result.summary);
+
+                document.getElementById('result').innerHTML = htmlContent;
+            } catch (error) {
+                document.getElementById('result').innerText = 'Ошибка: ' + error.message;
+            } finally {
+                // Скрываем прелоудер и сообщение
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('processing-message').style.display = 'none';
+
+                // Включаем кнопку отправки обратно
+                submitButton.disabled = false;
+                submitButton.textContent = 'Отправить';
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        label {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+
+        input[type="file"] {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        textarea {
+            width: 100%;
+            max-width: 600px;
+            height: 150px;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1.2rem;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            text-align: left;
+            max-width: 100%;
+            overflow-wrap: break-word; /* Чтобы длинные слова не ломали верстку */
+        }
+
+        #result h1, #result h2, #result h3, #result p, #result ul, #result ol {
+            margin: 0;
+            padding: 10px 0;
+        }
+
+        #result ul, #result ol {
+            padding-left: 20px;
+        }
+
+        #result li {
+            margin-bottom: 5px;
+        }
+
+        /* Прелоудер */
+        #loader {
+            display: none;
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #3498db;
+            width: 60px;
+            height: 60px;
+            animation: spin 2s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Сообщение о процессе обработки */
+        #processing-message {
+            display: none;
+            font-size: 1.2rem;
+            color: #555;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Загрузка видео и промта</h1>
+        <form id="upload-form" enctype="multipart/form-data" onsubmit="uploadVideo(event)">
+            <label for="file">Выберите видеофайл:</label>
+            <input type="file" name="file" id="file" required>
+
+            <label for="prompt">Введите промт для обработки:</label>
+            <textarea name="prompt" id="prompt" required>
+Ты - опытный бизнес-аналитик. Тебе предоставлена транскрипция деловой встречи. Твоя задача - проанализировать эту транскрипцию и создать следующие разделы:
+
+1. Информация о встрече:
+   - Дата и время встречи (если указаны)
+   - Список участников встречи, включая:
+     а) Имена участников
+     б) Названия компаний, которые они представляют
+     в) Должности участников (если упоминаются)
+
+2. Итоги встречи:
+   - Кратко изложи основные темы, обсуждавшиеся на встрече.
+   - Выдели ключевые решения, принятые во время обсуждения.
+   - Отметь важные моменты или договоренности, достигнутые участниками.
+
+3. Задачи для выполнения:
+   - Составь список конкретных задач, вытекающих из обсуждения.
+   - Для каждой задачи, если возможно, укажи:
+     а) Ответственное лицо или отдел
+     б) Предполагаемые сроки выполнения (если они упоминались)
+     в) Любые дополнительные детали или требования к задаче.
+            </textarea>
+
+            <button type="submit">Отправить</button>
+        </form>
+
+        <!-- Прелоудер и сообщение -->
+        <div id="loader"></div>
+        <div id="processing-message">Обработка видео может занять несколько минут. Пожалуйста, подождите...</div>
+
+        <!-- Результат -->
+        <div id="result"></div>
+    </div>
+</body>
+</html>
