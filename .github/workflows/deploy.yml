@@ -19,14 +19,18 @@ jobs:
     - name: Login to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Building and Pushing Docker image
-      run: docker build -t trofimov/summvideo:latest .
+    - name: Build Docker image
+      run: docker build -t yourdockerhubusername/myapp:latest .
 
-    - name: Deploying on Droplet
+    - name: Add SSH key
+      uses: webfactory/ssh-agent@v0.5.3
+      with:
+        ssh-private-key: ${{ secrets.DEPLOY_KEY }}
+
+    - name: Deploy to DigitalOcean
       run: |
-        ssh root@167.172.164.66 << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@your_droplet_ip << 'EOF'
           cd /var/www/myapp
-          git pull origin main
           docker-compose down
           docker-compose up -d --build
         EOF
