@@ -20,7 +20,7 @@ jobs:
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
     - name: Build Docker image
-      run: docker build -t yourdockerhubusername/myapp:latest .
+      run: docker build -t trofimov/myapp:latest .
 
     - name: Add SSH key
       uses: webfactory/ssh-agent@v0.5.3
@@ -29,7 +29,7 @@ jobs:
 
     - name: Deploy to DigitalOcean
       run: |
-        ssh -o StrictHostKeyChecking=no root@your_droplet_ip << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@167.172.164.66 << 'EOF'
           cd /var/www/myapp
           docker-compose down
           docker-compose up -d --build
