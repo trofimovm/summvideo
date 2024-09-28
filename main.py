@@ -30,7 +30,11 @@ LOG_FILE = os.path.join(LOG_DIR, "transcriptions_summary.log")
 
 # Создаем директорию для логов, если она не существует
 if not os.path.exists(LOG_DIR):
-    os.makedirs(LOG_DIR)
+    try:
+        os.makedirs(LOG_DIR)
+        print(f"Директория {LOG_DIR} создана.")
+    except Exception as e:
+        print(f"Ошибка при создании директории {LOG_DIR}: {str(e)}")
 
 # Настраиваем логирование
 logging.basicConfig(
@@ -50,7 +54,11 @@ def log_transcription(video_filename, prompt, transcription_text, summary):
         f"Саммари: {summary}\n"
         "------------------------\n"
     )
-    logging.info(log_message)
+    try:
+        logging.info(log_message)
+        print("Информация записана в лог.")
+    except Exception as e:
+        print(f"Ошибка при записи в лог-файл: {str(e)}")
 
 def extract_and_convert_audio(video_file, audio_file):
     """Функция для извлечения и конвертации аудио."""
