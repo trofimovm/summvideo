@@ -29,7 +29,7 @@ jobs:
 
     - name: Deploy to DigitalOcean
       run: |
-        ssh -o StrictHostKeyChecking=no root@167.172.164.66 << 'EOF'
+        ssh -o StrictHostKeyChecking=no root@167.172.184.49 << 'EOF'
           cd /var/www/myapp
           docker compose down
           docker compose up -d --build
