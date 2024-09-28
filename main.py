@@ -125,9 +125,8 @@ async def upload_video(file: UploadFile = File(...), prompt: str = Form(...)):
         # Генерация саммари на основе переданного промта
         summary = summarize_meeting_with_custom_prompt(api_key, transcription_text, prompt)
 
-        # Логирование в ту же папку, где видеофайлы
-        video_directory = os.path.dirname(video_file.name)
-        write_log(file.filename, video_directory, prompt, transcription_text, summary)
+        # Логирование
+        write_log(file.filename, prompt, transcription_text, summary)
 
         return JSONResponse(content={"summary": summary})
 
