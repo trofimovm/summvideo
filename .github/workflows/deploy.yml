@@ -10,42 +10,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checking out the repository
+    - name: Check out the repository
       uses: actions/checkout@v3
 
+    # Docker setup
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-    - name: Login to Docker Hub
+    # Log in to Docker Hub (if necessary, optional step)
+    - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+    # Build Docker image and optionally push to Docker Hub
     - name: Build Docker image
       run: docker build -t trofimov/myapp:latest .
 
     - name: Push Docker image to Docker Hub
       run: docker push trofimov/myapp:latest
 
-    - name: Create .ssh directory
-      run: mkdir -p ~/.ssh
-
-    - name: Add server to known_hosts
-      run: |
-        ssh-keyscan 167.172.184.49 >> ~/.ssh/known_hosts
-
-    - name: Add SSH key
+    # Set up SSH access
+    - name: Set up SSH for deployment
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
-    - name: Deploy to server
+    # Add server's SSH key to known_hosts to prevent host verification errors
+    - name: Add DigitalOcean Droplet to known_hosts
       run: |
-        ssh root@167.172.184.49 << EOF
-          if [ ! -d "/var/www/myapp" ]; then
+        mkdir -p ~/.ssh
+        ssh-keyscan -H 167.172.184.49 >> ~/.ssh/known_hosts
+
+    # Deploy to the Droplet
+    - name: Deploy to DigitalOcean Droplet
+      run: |
+        ssh root@167.172.184.49 << 'EOF'
+          # Ensure the target directory exists, or clone if necessary
+          if [ ! -d "/var/www/myapp/.git" ]; then
+            rm -rf /var/www/myapp
             mkdir -p /var/www/myapp
-            git clone git@github.com:your-github-username/your-repository-name.git /var/www/myapp
+            git clone git@github.com:trofimovm/summvideo.git /var/www/myapp
           fi
           cd /var/www/myapp
+
+          # Pull the latest changes
           git pull origin main
-          docker compose down
-          docker compose up -d --build
+
+          # Run Docker Compose commands
+          docker-compose down
+          docker-compose up -d --build
         EOF
