@@ -179,9 +179,12 @@
 </head>
 <body>
     <div class="container">
-        <h1>Загрузка видео и промта</h1>
+        <h1>SummVideo: быстрое саммари для ваших видео</h1>
+        <p>Сервис для создания кратких саммари из видеоконтента. 
+            С помощью AI-технологий он выделяет главные моменты из любого видео, 
+            экономя ваше время и предоставляя только самую важную информацию.</p>
         <form id="upload-form" enctype="multipart/form-data" onsubmit="uploadVideo(event)">
-            <label for="file">Выберите видеофайл:</label>
+            <label for="file">Выберите видеофайл(максимальный размер 500 мб):</label>
             <input type="file" name="file" id="file" required>
 
             <label for="prompt">Введите промт для обработки:</label>
