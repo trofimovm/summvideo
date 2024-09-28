@@ -27,10 +27,11 @@ jobs:
       with:
         ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
-    - name: Deploy to DigitalOcean
+    - name: Deploy to server
       run: |
-        ssh -o StrictHostKeyChecking=no root@167.172.184.49 << 'EOF'
-          cd /var/www/myapp
+        ssh -o StrictHostKeyChecking=no root@167.172.184.49 << EOF
+          cd /var/www/myapp || { mkdir -p /var/www/myapp && cd /var/www/myapp; }
+          git pull origin main
           docker compose down
           docker compose up -d --build
         EOF
