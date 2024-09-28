@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Загрузка видео для саммари</title>
+    <title>SummVideo — сервис для создания кратких саммари из видеоконтента</title>
     <link rel="stylesheet" href="/static/styles.css">
     <link rel="apple-touch-icon" sizes="57x57" href="/static/favicon/apple-icon-57x57.png">
     <link rel="apple-touch-icon" sizes="60x60" href="/static/favicon/apple-icon-60x60.png">
@@ -24,6 +24,57 @@
     <meta name="theme-color" content="#ffffff">
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@12.2.0/dist/markdown-it.min.js"></script>
     <script>
+        function applyTemplate() {
+            const promptTextarea = document.getElementById('prompt');
+            const templateSelect = document.getElementById('template-select');
+
+            switch (templateSelect.value) {
+                case 'meeting_summary':
+                    promptTextarea.value = `
+Ты - опытный бизнес-аналитик. Тебе предоставлена транскрипция деловой встречи. Твоя задача - проанализировать эту транскрипцию и создать следующие разделы:
+
+1. Информация о встрече:
+   - Дата и время встречи (если указаны)
+   - Список участников встречи, включая:
+     а) Имена участников
+     б) Названия компаний, которые они представляют
+     в) Должности участников (если упоминаются)
+
+2. Итоги встречи:
+   - Кратко изложи основные темы, обсуждавшиеся на встрече.
+   - Выдели ключевые решения, принятые во время обсуждения.
+   - Отметь важные моменты или договоренности, достигнутые участниками.
+
+3. Задачи для выполнения:
+   - Составь список конкретных задач, вытекающих из обсуждения.
+   - Для каждой задачи, если возможно, укажи:
+     а) Ответственное лицо или отдел
+     б) Предполагаемые сроки выполнения (если они упоминались)
+     в) Любые дополнительные детали или требования к задаче.
+                    `;
+                    break;
+
+                case 'educational_video':
+                    promptTextarea.value = `
+Ты - учитель или преподаватель. Тебе нужно проанализировать видеозапись образовательного характера и создать следующие разделы:
+
+1. Основные темы:
+   - Опиши ключевые образовательные темы, обсуждаемые в видео.
+
+2. Практическое применение:
+   - Укажи, как материал можно использовать в реальной жизни или в учебном процессе.
+
+3. Важные моменты:
+   - Отметь важные факты, выводы или рекомендации, сделанные в видео.
+                    `;
+                    break;
+
+                case 'custom_prompt':
+                    promptTextarea.value = '';
+                    break;
+            }
+        }
+
         async function uploadVideo(event) {
             event.preventDefault();
 
@@ -129,6 +180,14 @@
             font-size: 1rem;
         }
 
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
         button {
             padding: 12px 25px;
             font-size: 1.2rem;
@@ -201,32 +260,18 @@
             С помощью AI-технологий он выделяет главные моменты из любого видео, 
             экономя ваше время и предоставляя только самую важную информацию.</p>
         <form id="upload-form" enctype="multipart/form-data" onsubmit="uploadVideo(event)">
-            <label for="file">Выберите видеофайл(максимальный размер 500 мб):</label>
+            <label for="file">Выберите видеофайл (максимальный размер 500 мб):</label>
             <input type="file" name="file" id="file" required>
 
+            <label for="template-select">Выберите шаблон промта:</label>
+            <select id="template-select" onchange="applyTemplate()">
+                <option value="meeting_summary">Итоги встречи</option>
+                <option value="educational_video">Обучающее видео</option>
+                <option value="custom_prompt">Свой промт</option>
+            </select>
+
             <label for="prompt">Введите промт для обработки:</label>
-            <textarea name="prompt" id="prompt" required>
-Ты - опытный бизнес-аналитик. Тебе предоставлена транскрипция деловой встречи. Твоя задача - проанализировать эту транскрипцию и создать следующие разделы:
-
-1. Информация о встрече:
-   - Дата и время встречи (если указаны)
-   - Список участников встречи, включая:
-     а) Имена участников
-     б) Названия компаний, которые они представляют
-     в) Должности участников (если упоминаются)
-
-2. Итоги встречи:
-   - Кратко изложи основные темы, обсуждавшиеся на встрече.
-   - Выдели ключевые решения, принятые во время обсуждения.
-   - Отметь важные моменты или договоренности, достигнутые участниками.
-
-3. Задачи для выполнения:
-   - Составь список конкретных задач, вытекающих из обсуждения.
-   - Для каждой задачи, если возможно, укажи:
-     а) Ответственное лицо или отдел
-     б) Предполагаемые сроки выполнения (если они упоминались)
-     в) Любые дополнительные детали или требования к задаче.
-            </textarea>
+            <textarea name="prompt" id="prompt" required></textarea>
 
             <button type="submit">Отправить</button>
         </form>
