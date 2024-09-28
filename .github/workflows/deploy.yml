@@ -30,7 +30,11 @@ jobs:
     - name: Deploy to server
       run: |
         ssh -o StrictHostKeyChecking=no root@167.172.184.49 << EOF
-          cd /var/www/myapp || { mkdir -p /var/www/myapp && cd /var/www/myapp; }
+          if [ ! -d "/var/www/myapp" ]; then
+            mkdir -p /var/www/myapp
+            git clone https://github.com/your-username/your-repo.git /var/www/myapp
+          fi
+          cd /var/www/myapp
           git pull origin main
           docker compose down
           docker compose up -d --build
