@@ -75,6 +75,11 @@
             }
         }
 
+        // Устанавливаем шаблон "Итоги встречи" при загрузке страницы
+        window.onload = function() {
+            applyTemplate();
+        };
+
         async function uploadVideo(event) {
             event.preventDefault();
 
@@ -265,7 +270,7 @@
 
             <label for="template-select">Выберите шаблон промта:</label>
             <select id="template-select" onchange="applyTemplate()">
-                <option value="meeting_summary">Итоги встречи</option>
+                <option value="meeting_summary" selected>Итоги встречи</option>
                 <option value="educational_video">Обучающее видео</option>
                 <option value="custom_prompt">Свой промт</option>
             </select>
