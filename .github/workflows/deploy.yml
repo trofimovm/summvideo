@@ -59,6 +59,8 @@ jobs:
 
           # Получение последних изменений
           git pull origin main
+          # Экспортируем переменные окружения
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" > /var/www/myapp/.env
 
           # Запуск Docker Compose
           docker compose down
