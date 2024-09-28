@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checking out the repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
@@ -22,6 +22,13 @@ jobs:
     - name: Build Docker image
       run: docker build -t trofimov/myapp:latest .
 
+    - name: Push Docker image to Docker Hub
+      run: docker push trofimov/myapp:latest
+
+    - name: Add server to known_hosts
+      run: |
+        ssh-keyscan 167.172.184.49 >> ~/.ssh/known_hosts
+
     - name: Add SSH key
       uses: webfactory/ssh-agent@v0.5.3
       with:
@@ -29,10 +36,10 @@ jobs:
 
     - name: Deploy to server
       run: |
-        ssh -o StrictHostKeyChecking=no root@167.172.184.49 << EOF
+        ssh root@167.172.184.49 << EOF
           if [ ! -d "/var/www/myapp" ]; then
             mkdir -p /var/www/myapp
-            git clone https://github.com/trofimovm/summvideo.git /var/www/myapp
+            git clone git@github.com:your-github-username/your-repository-name.git /var/www/myapp
           fi
           cd /var/www/myapp
           git pull origin main
