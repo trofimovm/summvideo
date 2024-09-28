@@ -25,6 +25,9 @@ jobs:
     - name: Push Docker image to Docker Hub
       run: docker push trofimov/myapp:latest
 
+    - name: Create .ssh directory
+      run: mkdir -p ~/.ssh
+
     - name: Add server to known_hosts
       run: |
         ssh-keyscan 167.172.184.49 >> ~/.ssh/known_hosts
