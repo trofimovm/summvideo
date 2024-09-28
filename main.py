@@ -23,10 +23,19 @@ PART_SIZE = 524288  # 512 KB
 MAX_RETRIES = 3
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB
 
-def write_log(video_filename, log_directory, prompt, transcription, summary):
-    """Запись данных в лог в ту же директорию, где сохранено видео."""
-    log_file_path = os.path.join(log_directory, "log.txt")
-    with open(log_file_path, "a") as log_file:
+LOG_DIR = "/var/log/summvideo"
+LOG_FILE = os.path.join(LOG_DIR, "log.txt")
+
+def ensure_log_directory_exists():
+    """Создаем директорию для логов, если её нет."""
+    if not os.path.exists(LOG_DIR):
+        os.makedirs(LOG_DIR)
+
+def write_log(video_filename, prompt, transcription, summary):
+    """Запись данных в лог."""
+    ensure_log_directory_exists()
+
+    with open(LOG_FILE, "a") as log_file:
         log_file.write(f"Дата и время: {datetime.now()}\n")
         log_file.write(f"Название видео: {video_filename}\n")
         log_file.write(f"Промт: {prompt}\n")
