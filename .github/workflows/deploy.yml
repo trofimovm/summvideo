@@ -61,6 +61,6 @@ jobs:
           git pull origin main
 
           # Запуск Docker Compose
-          docker-compose down
-          docker-compose up -d --build
+          docker compose down
+          docker compose up -d --build
         EOF
