@@ -94,7 +94,7 @@ async def upload_video(file: UploadFile = File(...), prompt: str = Form(...)):
         mp3_file = extract_and_convert_audio(video_file.name, audio_file)
         
         # Транскрибация аудио
-        api_key = os.getenv("y")
+        api_key = os.getenv("OPENAI_API_KEY")
         if not api_key:
             raise HTTPException(status_code=500, detail="API ключ OpenAI не найден.")
         
