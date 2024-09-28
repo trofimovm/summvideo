@@ -22,19 +22,11 @@ templates = Jinja2Templates(directory="templates")
 PART_SIZE = 524288  # 512 KB
 MAX_RETRIES = 3
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB
-LOG_DIR = "/tmp/summvideo"
-LOG_FILE = os.path.join(LOG_DIR, "log.txt")
 
-def ensure_log_directory_exists():
-    """Создаем директорию для логов, если её нет."""
-    if not os.path.exists(LOG_DIR):
-        os.makedirs(LOG_DIR)
-
-def write_log(video_filename, prompt, transcription, summary):
-    """Запись данных в лог."""
-    ensure_log_directory_exists()
-
-    with open(LOG_FILE, "a") as log_file:
+def write_log(video_filename, log_directory, prompt, transcription, summary):
+    """Запись данных в лог в ту же директорию, где сохранено видео."""
+    log_file_path = os.path.join(log_directory, "log.txt")
+    with open(log_file_path, "a") as log_file:
         log_file.write(f"Дата и время: {datetime.now()}\n")
         log_file.write(f"Название видео: {video_filename}\n")
         log_file.write(f"Промт: {prompt}\n")
@@ -124,8 +116,9 @@ async def upload_video(file: UploadFile = File(...), prompt: str = Form(...)):
         # Генерация саммари на основе переданного промта
         summary = summarize_meeting_with_custom_prompt(api_key, transcription_text, prompt)
 
-        # Логирование
-        write_log(file.filename, prompt, transcription_text, summary)
+        # Логирование в ту же папку, где видеофайлы
+        video_directory = os.path.dirname(video_file.name)
+        write_log(file.filename, video_directory, prompt, transcription_text, summary)
 
         return JSONResponse(content={"summary": summary})
 
