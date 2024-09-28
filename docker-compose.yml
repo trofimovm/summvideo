@@ -7,4 +7,5 @@ services:
       - "8000:8000"
     volumes:
       - .:/usr/src/app
+      - ./logs:/var/log/summvideo   # Добавляем volume для логов
     restart: always
