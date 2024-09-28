@@ -8,6 +8,8 @@ from moviepy.editor import VideoFileClip
 from pydub import AudioSegment
 import tempfile
 from openai import OpenAI
+import logging
+from datetime import datetime
 
 app = FastAPI()
 
@@ -21,6 +23,34 @@ templates = Jinja2Templates(directory="templates")
 PART_SIZE = 524288  # 512 KB
 MAX_RETRIES = 3
 MAX_FILE_SIZE = 500 * 1024 * 1024  # 500 MB
+
+# Настраиваем директорию для логов
+LOG_DIR = "/tmp/summvideo"
+LOG_FILE = os.path.join(LOG_DIR, "transcriptions_summary.log")
+
+# Создаем директорию для логов, если она не существует
+if not os.path.exists(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+# Настраиваем логирование
+logging.basicConfig(
+    filename=LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+)
+
+def log_transcription(video_filename, prompt, transcription_text, summary):
+    """Записываем информацию о транскрипции и саммари в лог-файл."""
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_message = (
+        f"Дата: {timestamp}\n"
+        f"Название видео: {video_filename}\n"
+        f"Промт: {prompt}\n"
+        f"Текст транскрипции: {transcription_text}\n"
+        f"Саммари: {summary}\n"
+        "------------------------\n"
+    )
+    logging.info(log_message)
 
 def extract_and_convert_audio(video_file, audio_file):
     """Функция для извлечения и конвертации аудио."""
@@ -103,6 +133,9 @@ async def upload_video(file: UploadFile = File(...), prompt: str = Form(...)):
         
         # Генерация саммари на основе переданного промта
         summary = summarize_meeting_with_custom_prompt(api_key, transcription_text, prompt)
+
+        # Логируем транскрипцию и саммари
+        log_transcription(file.filename, prompt, transcription_text, summary)
 
         return JSONResponse(content={"summary": summary})
 
