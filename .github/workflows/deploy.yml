@@ -17,34 +17,39 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-    # Log in to Docker Hub (if necessary, optional step)
+    # Log in to Docker Hub (если требуется)
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    # Build Docker image and optionally push to Docker Hub
+    # Сборка Docker-образа и (опционально) публикация в Docker Hub
     - name: Build Docker image
       run: docker build -t trofimov/myapp:latest .
 
     - name: Push Docker image to Docker Hub
       run: docker push trofimov/myapp:latest
 
-    # Set up SSH access
+    # Настройка SSH для доступа к серверу
     - name: Set up SSH for deployment
       uses: webfactory/ssh-agent@v0.5.3
       with:
         ssh-private-key: ${{ secrets.DEPLOY_KEY }}
 
-    # Add server's SSH key to known_hosts to prevent host verification errors
+    # Добавление SSH-ключа вашего сервера в файл known_hosts на runner-е (ваш сервер)
     - name: Add DigitalOcean Droplet to known_hosts
       run: |
         mkdir -p ~/.ssh
         ssh-keyscan -H 167.172.184.49 >> ~/.ssh/known_hosts
 
-    # Deploy to the Droplet
+    # Добавление GitHub в known_hosts на сервере
+    - name: Add GitHub to known_hosts on the Droplet
+      run: |
+        ssh root@167.172.184.49 "ssh-keyscan -H github.com >> ~/.ssh/known_hosts"
+
+    # Деплой на сервер
     - name: Deploy to DigitalOcean Droplet
       run: |
         ssh root@167.172.184.49 << 'EOF'
-          # Ensure the target directory exists, or clone if necessary
+          # Проверка существования папки и клонирование репозитория при необходимости
           if [ ! -d "/var/www/myapp/.git" ]; then
             rm -rf /var/www/myapp
             mkdir -p /var/www/myapp
@@ -52,10 +57,10 @@ jobs:
           fi
           cd /var/www/myapp
 
-          # Pull the latest changes
+          # Получение последних изменений
           git pull origin main
 
-          # Run Docker Compose commands
+          # Запуск Docker Compose
           docker-compose down
           docker-compose up -d --build
         EOF
