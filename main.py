@@ -128,7 +128,8 @@ async def upload_video(file: UploadFile = File(...), prompt: str = Form(...)):
         # Логирование
         write_log(file.filename, prompt, transcription_text, summary)
 
-        return JSONResponse(content={"summary": summary})
+        # Включаем транскрипцию в ответ
+        return JSONResponse(content={"summary": summary, "transcription": transcription_text})
 
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
