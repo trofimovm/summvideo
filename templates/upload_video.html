@@ -4,48 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SummVideo — сервис для создания кратких саммари из видеоконтента</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <link rel="stylesheet" href="/static/vue/css/app.91ac7c34.css">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22256%22 height=%22256%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%234a90e2%22></rect><text x=%2250%%22 y=%2250%%22 dominant-baseline=%22central%22 text-anchor=%22middle%22 font-size=%2290%22>🎙️</text></svg>" />
     <meta name="theme-color" content="#ffffff">
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@12.2.0/dist/markdown-it.min.js"></script>
-    <script src="/static/prompts.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h1>SummVideo</h1>
-        <p>Сервис для создания кратких саммари из видеоконтента. 
-            С помощью AI-технологий он выделяет главные моменты из любого видео, 
-            экономя ваше время и предоставляя только самую важную информацию.</p>
-        <form id="upload-form" enctype="multipart/form-data" onsubmit="uploadVideo(event)">
-            <label for="file">Выберите видеофайл (максимальный размер 500 мб):</label>
-            <input type="file" name="file" id="file" required>
-
-            <label for="template-select">Выберите шаблон промта:</label>
-            <select id="template-select" onchange="applyTemplate()">
-                <!-- Шаблоны будут загружены из JSON файла -->
-            </select>
-
-            <label for="prompt">Введите промт для обработки:</label>
-            <textarea name="prompt" id="prompt" required></textarea>
-
-            <button type="submit">Отправить</button>
-        </form>
-
-        <!-- Прелоудер и сообщение -->
-        <div id="loader"></div>
-        <div id="processing-message">Обработка видео может занять несколько минут. Пожалуйста, подождите...</div>
-
-        <!-- Результат -->
-        <div id="result"></div>
-        
-        <!-- Блок с транскрипцией -->
-        <div id="transcription-container">
-            <button id="transcription-toggle" onclick="toggleTranscription()">Показать транскрипцию</button>
-            <div id="transcription-content">
-                <h3>Полная транскрипция:</h3>
-                <div id="transcription-text"></div>
-            </div>
-        </div>
-    </div>
+    <div id="app"></div>
+    <script src="/static/vue/js/chunk-vendors.b27501e0.js"></script>
+    <script src="/static/vue/js/app.2c65fa1c.js"></script>
 </body>
 </html>

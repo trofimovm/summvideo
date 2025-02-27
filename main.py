@@ -1,7 +1,7 @@
 import os
 import math
 from fastapi import FastAPI, UploadFile, File, Form, HTTPException, Request
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from moviepy import VideoFileClip
@@ -90,8 +90,14 @@ def summarize_meeting_with_custom_prompt(api_key, transcript, prompt):
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    """Отображение HTML страницы для загрузки видео."""
+    """Отображение HTML страницы приложения Vue."""
+    # Запасной вариант - старый шаблон, если Vue.js сборка отсутствует
     return templates.TemplateResponse("upload_video.html", {"request": request})
+
+@app.get("/index.html", response_class=HTMLResponse)
+async def read_vue_index(request: Request):
+    """Перенаправление на главную страницу."""
+    return RedirectResponse(url="/")
 
 @app.post("/upload_video/")
 async def upload_video(file: UploadFile = File(...), prompt: str = Form(...)):

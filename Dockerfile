@@ -1,21 +1,21 @@
-# Указываем базовый образ с Python
+# Build backend directly without Vue.js for now
 FROM python:3.10-slim
 
-# Устанавливаем зависимости системы (включая ffmpeg для работы с видео и аудио)
+# Install system dependencies (including ffmpeg for video and audio processing)
 RUN apt-get update && apt-get install -y ffmpeg
 
-# Устанавливаем рабочую директорию внутри контейнера
+# Set working directory inside the container
 WORKDIR /usr/src/app
 
-# Копируем файл зависимостей и устанавливаем их
+# Copy dependency file and install dependencies
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Копируем все файлы проекта в контейнер
+# Copy all project files to the container
 COPY . .
 
-# Указываем переменные окружения
+# Environment variables
 ENV OPENAI_API_KEY=ваш_ключ_openai
 
-# Команда для запуска FastAPI приложения через Uvicorn
+# Command to run the FastAPI application through Uvicorn
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]

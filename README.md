@@ -16,7 +16,7 @@ SummVideo is a service that creates concise summaries from video content using A
 ## 🛠️ Tech Stack
 
 - **Backend**: FastAPI, Python 3.10
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: Vue.js 3, HTML, CSS
 - **Media Processing**: FFmpeg, MoviePy, PyDub
 - **AI Services**: OpenAI API (Whisper for transcription, GPT-4o-mini for summarization)
 - **Containerization**: Docker, Docker Compose
@@ -43,12 +43,19 @@ SummVideo is a service that creates concise summaries from video content using A
    echo "OPENAI_API_KEY=your_openai_api_key" > .env
    ```
 
-3. Build and start the Docker container:
+3. For frontend development (optional):
+   ```bash
+   cd frontend
+   npm install
+   npm run serve
+   ```
+
+4. Build and start the Docker container:
    ```bash
    docker compose up -d
    ```
 
-4. Access the application at `http://localhost:8000`
+5. Access the application at `http://localhost:8000`
 
 ### Production Deployment
 
@@ -83,8 +90,13 @@ The project includes a GitHub Actions workflow that automatically deploys to a D
 ```
 summvideo/
 ├── .github/workflows/   # GitHub Actions workflow configurations
-├── static/              # Static assets (CSS)
-├── templates/           # HTML templates
+├── frontend/            # Vue.js frontend application
+│   ├── src/             # Vue components and application logic
+│   ├── public/          # Static assets for Vue.js
+│   └── package.json     # Frontend dependencies
+├── static/              # Static assets (CSS, JS)
+│   └── vue/             # Built Vue.js application (after build)
+├── templates/           # HTML templates (legacy)
 ├── .gitignore           # Git ignore file
 ├── docker-compose.yml   # Docker Compose configuration
 ├── Dockerfile           # Docker build configuration
@@ -95,11 +107,11 @@ summvideo/
 
 ## ⚙️ How It Works
 
-1. **Video Upload**: Users upload video files through the web interface
+1. **Video Upload**: Users upload video files through the Vue.js interface
 2. **Audio Extraction**: FFmpeg extracts audio from the video
 3. **Transcription**: OpenAI's Whisper model transcribes the audio to text
 4. **Summarization**: OpenAI's GPT-4o-mini generates a summary based on the chosen prompt
-5. **Result Display**: The summary is rendered in markdown format, with an option to view the full transcription
+5. **Result Display**: The summary is rendered in markdown format in the Vue.js interface, with an option to view the full transcription
 
 ## 📝 Logging
 
