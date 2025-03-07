@@ -21,18 +21,24 @@ const ApiService = {
    * Upload video file and prompt for processing
    * @param {File} file - The video file to upload
    * @param {String} prompt - The prompt text for processing
+   * @param {String} token - JWT auth token
    */
-  async uploadVideo(file, prompt) {
+  async uploadVideo(file, prompt, token) {
     try {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('prompt', prompt);
 
-      const response = await axios.post(`${API_URL}/upload_video/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
+      const headers = {
+        'Content-Type': 'multipart/form-data'
+      };
+      
+      // Добавляем заголовок авторизации, если токен предоставлен
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await axios.post(`${API_URL}/upload_video/`, formData, { headers });
 
       return response.data;
     } catch (error) {

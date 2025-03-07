@@ -1,11 +1,38 @@
 services:
-  fastapi_app:
-    build: .
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      POSTGRES_USER: ${POSTGRES_USER:-summvideo}
+      POSTGRES_DB: ${POSTGRES_DB:-summvideo}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+  summvideo-app:
+    build: ./backend-go
     environment:
       OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN}
+      JWT_SECRET: ${JWT_SECRET:-your_jwt_secret}
+      DATABASE_URL: postgres://${POSTGRES_USER:-summvideo}:${POSTGRES_PASSWORD:-password}@db:5432/${POSTGRES_DB:-summvideo}
+      GIN_MODE: release
+      STATIC_DIR: "/app/static"
+      TEMPLATES_DIR: "/app/templates"
+      MIGRATIONS_DIR: "/app/migrations"
+      DEV_MODE: ${DEV_MODE:-false}
     ports:
       - "8000:8000"
     volumes:
-      - .:/usr/src/app
-      - ./logs:/var/log/summvideo   # Добавляем volume для логов
+      - ./logs:/var/log/summvideo
+      - ./static:/app/static
+      - ./templates:/app/templates
+      - ./backend-go/migrations:/app/migrations
+    depends_on:
+      - db
     restart: always
+
+volumes:
+  postgres_data:

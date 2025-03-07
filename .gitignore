@@ -22,7 +22,8 @@ docker-compose.override.yml
 
 # Игнорирование логов
 *.log
-logs/
+logs/*
+!logs/.gitkeep
 
 # Игнорирование временных файлов и кэшей
 *.swp
@@ -37,3 +38,9 @@ logs/
 # Игнорирование файлов и папок, созданных системой или редактором
 Thumbs.db
 .DS_Store
+
+# Игнорирование source maps
+*.map
+/static/vue/*.map
+/static/vue/js/*.map
+/static/vue/css/*.map

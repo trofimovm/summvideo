@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Панель администратора | SummVideo — умные резюме видео</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            padding: 0;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+        }
+        
+        .sidebar-header p {
+            margin: 0.5rem 0 0;
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .sidebar-menu {
+            list-style: none;
+            padding: 1.5rem 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .sidebar-menu li:hover, .sidebar-menu li.active {
+            background-color: #34495e;
+        }
+        
+        .sidebar-menu li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+        }
+        
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        .page-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #2c3e50;
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #e1e8ed;
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            padding: 1.5rem;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #3498db;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 0.75rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e1e8ed;
+        }
+        
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            text-decoration: none;
+        }
+        
+        .btn-sm {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: #2ecc71;
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-danger {
+            background-color: #e74c3c;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-warning {
+            background-color: #f39c12;
+        }
+        
+        .btn-warning:hover {
+            background-color: #d35400;
+        }
+        
+        .user-details {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .user-info {
+            margin-bottom: 1.5rem;
+        }
+        
+        .user-info h3 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #e1e8ed;
+            padding-bottom: 0.5rem;
+        }
+        
+        .info-row {
+            display: flex;
+            margin-bottom: 0.5rem;
+        }
+        
+        .info-label {
+            font-weight: 600;
+            width: 200px;
+        }
+        
+        .limit-form {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e1e8ed;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            width: 100%;
+            max-width: 300px;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 500px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #555;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 1.5rem;
+        }
+        
+        .pagination button {
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .pagination button:hover, .pagination button.active {
+            background-color: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>SummVideo</h2>
+                <p>Умные резюме видео</p>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="active"><a href="#" data-section="users-section">Пользователи</a></li>
+                <li><a href="#" data-section="stats-section">Статистика</a></li>
+                <li><a href="#" data-section="settings-section">Настройки</a></li>
+                <li><a href="#" id="logout-link">Выйти</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <!-- Секция пользователей -->
+            <section id="users-section" class="content-section">
+                <div class="page-header">
+                    <h1>Управление пользователями</h1>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Список пользователей
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table id="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Имя пользователя</th>
+                                        <th>Имя</th>
+                                        <th>Лимит</th>
+                                        <th>Использовано</th>
+                                        <th>Осталось</th>
+                                        <th>Действия</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <!-- Данные будут загружены с помощью JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="users-pagination" class="pagination">
+                            <!-- Пагинация будет создана с помощью JavaScript -->
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="user-details" class="user-details">
+                    <div class="user-info">
+                        <h3>Информация о пользователе</h3>
+                        <div class="info-row">
+                            <div class="info-label">ID:</div>
+                            <div id="user-id"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Имя пользователя:</div>
+                            <div id="user-username"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Имя:</div>
+                            <div id="user-name"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Дата регистрации:</div>
+                            <div id="user-created"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Последний вход:</div>
+                            <div id="user-last-login"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Лимит использования:</div>
+                            <div id="user-limit"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Использовано:</div>
+                            <div id="user-used"></div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Осталось:</div>
+                            <div id="user-remaining"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="limit-form">
+                        <h3>Изменить лимит использования</h3>
+                        <div class="form-group">
+                            <label for="new-limit">Новый лимит (в секундах):</label>
+                            <input type="number" id="new-limit" class="form-control" min="0" step="60">
+                        </div>
+                        <button id="update-limit-btn" class="btn btn-primary">Обновить лимит</button>
+                        <span id="limit-update-msg"></span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Секция статистики -->
+            <section id="stats-section" class="content-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Статистика системы</h1>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-users">0</div>
+                        <div class="stat-label">Пользователей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-videos">0</div>
+                        <div class="stat-label">Обработано видео</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="total-processing-time">0</div>
+                        <div class="stat-label">Часов обработки</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avg-processing-time">0</div>
+                        <div class="stat-label">Среднее время (сек)</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Секция настроек -->
+            <section id="settings-section" class="content-section" style="display: none;">
+                <div class="page-header">
+                    <h1>Настройки системы</h1>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        Настройки лимитов
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="default-limit">Лимит по умолчанию для новых пользователей (в секундах):</label>
+                            <input type="number" id="default-limit" class="form-control" value="3600" min="0" step="60">
+                        </div>
+                        <button id="save-settings-btn" class="btn btn-primary">Сохранить настройки</button>
+                        <span id="settings-update-msg"></span>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Проверка авторизации
+            const token = localStorage.getItem('admin_token');
+            if (!token) {
+                window.location.href = '/admin';
+                return;
+            }
+            
+            // Глобальные переменные
+            let currentPage = 1;
+            let totalPages = 1;
+            let selectedUserId = null;
+            
+            // Переключение между разделами
+            const menuItems = document.querySelectorAll('.sidebar-menu li a');
+            const sections = document.querySelectorAll('.content-section');
+            
+            menuItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    if (this.id === 'logout-link') {
+                        // Выход из системы
+                        localStorage.removeItem('admin_token');
+                        window.location.href = '/admin';
+                        return;
+                    }
+                    
+                    // Обновляем активный пункт меню
+                    menuItems.forEach(i => i.parentElement.classList.remove('active'));
+                    this.parentElement.classList.add('active');
+                    
+                    // Показываем нужную секцию
+                    const sectionId = this.getAttribute('data-section');
+                    sections.forEach(section => {
+                        section.style.display = section.id === sectionId ? 'block' : 'none';
+                    });
+                    
+                    // Если открываем статистику, загружаем ее
+                    if (sectionId === 'stats-section') {
+                        loadStatistics();
+                    }
+                    
+                    e.preventDefault();
+                });
+            });
+            
+            // Загрузка списка пользователей
+            async function loadUsers(page = 1, pageSize = 10) {
+                try {
+                    const response = await fetch(`/api/admin/users?page=${page}&page_size=${pageSize}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Ошибка загрузки пользователей');
+                    }
+                    
+                    const data = await response.json();
+                    renderUsers(data.users);
+                    renderPagination(data.pagination);
+                    
+                    // Обновляем счетчик в статистике
+                    document.getElementById('total-users').textContent = data.pagination.total;
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка загрузки пользователей: ' + error.message);
+                }
+            }
+            
+            // Отображение списка пользователей
+            function renderUsers(users) {
+                const tableBody = document.getElementById('users-table-body');
+                tableBody.innerHTML = '';
+                
+                users.forEach(user => {
+                    const remaining = user.usage_limit_secs - user.usage_total_secs;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${user.id}</td>
+                        <td>${user.username || '—'}</td>
+                        <td>${user.first_name} ${user.last_name}</td>
+                        <td>${formatTime(user.usage_limit_secs)}</td>
+                        <td>${formatTime(user.usage_total_secs)}</td>
+                        <td>${formatTime(remaining)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary view-user" data-id="${user.id}">Подробнее</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+                
+                // Добавляем обработчики на кнопки
+                document.querySelectorAll('.view-user').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const userId = this.getAttribute('data-id');
+                        loadUserDetails(userId);
+                    });
+                });
+            }
+            
+            // Отображение пагинации
+            function renderPagination(pagination) {
+                const paginationElement = document.getElementById('users-pagination');
+                paginationElement.innerHTML = '';
+                
+                totalPages = pagination.pages;
+                
+                // Кнопка "Назад"
+                if (pagination.page > 1) {
+                    const prevButton = document.createElement('button');
+                    prevButton.textContent = '←';
+                    prevButton.addEventListener('click', () => loadUsers(pagination.page - 1));
+                    paginationElement.appendChild(prevButton);
+                }
+                
+                // Номера страниц
+                for (let i = 1; i <= pagination.pages; i++) {
+                    const pageButton = document.createElement('button');
+                    pageButton.textContent = i;
+                    if (i === pagination.page) {
+                        pageButton.classList.add('active');
+                    }
+                    pageButton.addEventListener('click', () => loadUsers(i));
+                    paginationElement.appendChild(pageButton);
+                }
+                
+                // Кнопка "Вперед"
+                if (pagination.page < pagination.pages) {
+                    const nextButton = document.createElement('button');
+                    nextButton.textContent = '→';
+                    nextButton.addEventListener('click', () => loadUsers(pagination.page + 1));
+                    paginationElement.appendChild(nextButton);
+                }
+                
+                currentPage = pagination.page;
+            }
+            
+            // Загрузка данных пользователя
+            async function loadUserDetails(userId) {
+                try {
+                    const response = await fetch(`/api/admin/users/${userId}/usage`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Ошибка загрузки данных пользователя');
+                    }
+                    
+                    const data = await response.json();
+                    renderUserDetails(data);
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    alert('Ошибка загрузки данных пользователя: ' + error.message);
+                }
+            }
+            
+            // Отображение данных пользователя
+            function renderUserDetails(userData) {
+                const user = userData.user;
+                selectedUserId = user.id;
+                
+                document.getElementById('user-id').textContent = user.id;
+                document.getElementById('user-username').textContent = user.username || '—';
+                document.getElementById('user-name').textContent = `${user.first_name} ${user.last_name}`;
+                document.getElementById('user-created').textContent = formatDate(user.created_at);
+                document.getElementById('user-last-login').textContent = formatDate(user.last_login);
+                document.getElementById('user-limit').textContent = formatTime(user.usage_limit_secs);
+                document.getElementById('user-used').textContent = formatTime(user.usage_total_secs);
+                document.getElementById('user-remaining').textContent = formatTime(userData.remaining_usage_seconds);
+                
+                document.getElementById('new-limit').value = user.usage_limit_secs;
+                
+                document.getElementById('user-details').style.display = 'block';
+            }
+            
+            // Обновление лимита использования
+            document.getElementById('update-limit-btn').addEventListener('click', async function() {
+                if (!selectedUserId) return;
+                
+                const newLimit = parseInt(document.getElementById('new-limit').value);
+                if (isNaN(newLimit) || newLimit < 0) {
+                    alert('Пожалуйста, введите корректное значение лимита');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/admin/users/limit', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify({
+                            user_id: selectedUserId,
+                            limit_seconds: newLimit
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Ошибка обновления лимита');
+                    }
+                    
+                    const data = await response.json();
+                    
+                    // Показываем сообщение об успехе
+                    const msgElement = document.getElementById('limit-update-msg');
+                    msgElement.textContent = 'Лимит успешно обновлен';
+                    msgElement.style.color = 'green';
+                    
+                    // Обновляем отображение
+                    loadUserDetails(selectedUserId);
+                    loadUsers(currentPage);
+                    
+                    // Скрываем сообщение через 3 секунды
+                    setTimeout(() => {
+                        msgElement.textContent = '';
+                    }, 3000);
+                    
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                    
+                    // Показываем сообщение об ошибке
+                    const msgElement = document.getElementById('limit-update-msg');
+                    msgElement.textContent = 'Ошибка обновления лимита: ' + error.message;
+                    msgElement.style.color = 'red';
+                    
+                    // Скрываем сообщение через 3 секунды
+                    setTimeout(() => {
+                        msgElement.textContent = '';
+                    }, 3000);
+                }
+            });
+            
+            // Сохранение настроек
+            document.getElementById('save-settings-btn').addEventListener('click', function() {
+                const defaultLimit = parseInt(document.getElementById('default-limit').value);
+                if (isNaN(defaultLimit) || defaultLimit < 0) {
+                    alert('Пожалуйста, введите корректное значение лимита');
+                    return;
+                }
+                
+                // Сохраняем настройки
+                localStorage.setItem('default_limit', defaultLimit);
+                
+                // Показываем сообщение об успехе
+                const msgElement = document.getElementById('settings-update-msg');
+                msgElement.textContent = 'Настройки успешно сохранены';
+                msgElement.style.color = 'green';
+                
+                // Скрываем сообщение через 3 секунды
+                setTimeout(() => {
+                    msgElement.textContent = '';
+                }, 3000);
+            });
+            
+            // Загрузка статистики системы
+            async function loadStatistics() {
+                // TODO: Реализовать загрузку статистики с сервера
+                // Временно используем заглушки
+                document.getElementById('total-videos').textContent = '0';
+                document.getElementById('total-processing-time').textContent = '0';
+                document.getElementById('avg-processing-time').textContent = '0';
+            }
+            
+            // Вспомогательные функции
+            function formatTime(seconds) {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                
+                return `${hours}ч ${minutes}м ${secs}с`;
+            }
+            
+            function formatDate(dateString) {
+                const date = new Date(dateString);
+                return date.toLocaleString('ru-RU');
+            }
+            
+            // Загружаем список пользователей при загрузке страницы
+            loadUsers();
+            
+            // Загружаем настройки
+            const defaultLimit = localStorage.getItem('default_limit') || 3600;
+            document.getElementById('default-limit').value = defaultLimit;
+        });
+    </script>
+</body>
+</html>

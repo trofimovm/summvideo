@@ -1,7 +1,11 @@
 import { createStore } from 'vuex'
 import ApiService from '../services/ApiService'
+import auth from './modules/auth'
 
 export default createStore({
+  modules: {
+    auth
+  },
   state: {
     promptTemplates: [],
     isProcessing: false,
@@ -48,12 +52,15 @@ export default createStore({
         console.error('Error loading prompt templates:', error);
       }
     },
-    async processVideo({ commit }, { file, prompt }) {
+    async processVideo({ commit, rootGetters }, { file, prompt }) {
       commit('CLEAR_RESULTS');
       commit('SET_PROCESSING', true);
       
       try {
-        const result = await ApiService.uploadVideo(file, prompt);
+        // Получаем токен для авторизованного запроса
+        const token = rootGetters['auth/getToken'];
+        
+        const result = await ApiService.uploadVideo(file, prompt, token);
         commit('SET_SUMMARY', result.summary);
         commit('SET_TRANSCRIPTION', result.transcription);
       } catch (error) {

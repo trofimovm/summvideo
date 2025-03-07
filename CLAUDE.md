@@ -5,21 +5,32 @@
 - Stop application: `docker compose down`
 - View logs: `docker compose logs -f`
 - Rebuild container: `docker compose build`
-- Install dependencies: `pip install -r requirements.txt`
 
-## Code Style Guidelines
-- **Python Version**: 3.10
-- **Formatting**: PEP 8 compliant
-- **Documentation**: Use docstrings for functions and classes
-- **Imports**: Group standard library, third-party, and local imports
-- **Naming**:
-  - Functions: snake_case
-  - Variables: snake_case
-  - Constants: UPPER_CASE
-- **Error Handling**: Use try/except blocks with specific exceptions
-- **Language**: Russian comments, English variable names
+## Frontend Development
+- Start frontend dev server: `cd frontend && npm run serve`
+- Build frontend: `cd frontend && npm run build`
+- Test frontend: `cd frontend && npm run test`
+- Lint frontend: `cd frontend && npm run lint`
 
-## FastAPI Specifics
-- Use type hints for request and response models
-- Organize routes logically with appropriate HTTP methods
-- Handle errors with proper status codes and meaningful messages
+## Go Code Style Guidelines
+- Use `gofmt` for code formatting
+- Follow standard Go idioms and conventions
+- Error handling: always check errors and return them
+- Comment exported functions and types
+- Use descriptive variable names
+- Keep functions small and focused
+
+## Vue.js Guidelines
+- Use composition API
+- Create reusable components
+- Centralize state in Vuex store
+- Use TypeScript for type safety
+
+## Project Structure
+- Backend: handlers/, services/, models/, repositories/, middleware/
+- Frontend: src/components/, src/views/, src/store/
+
+## Common Tasks
+- Add a new API endpoint: Create handler in backend-go/handlers/
+- Add a new business logic: Create service in backend-go/services/ 
+- Update models: Add to backend-go/models/models.go

@@ -1,7 +1,0 @@
-fastapi
-uvicorn
-moviepy
-pydub
-openai
-Jinja2
-python-multipart

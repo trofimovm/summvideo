@@ -15,9 +15,9 @@ SummVideo is a service that creates concise summaries from video content using A
 
 ## 🛠️ Tech Stack
 
-- **Backend**: FastAPI, Python 3.10
+- **Backend**: Golang, Gin Web Framework
 - **Frontend**: Vue.js 3, HTML, CSS
-- **Media Processing**: FFmpeg, MoviePy, PyDub
+- **Media Processing**: FFmpeg (via Go wrappers)
 - **AI Services**: OpenAI API (Whisper for transcription, GPT-4o-mini for summarization)
 - **Containerization**: Docker, Docker Compose
 - **Deployment**: DigitalOcean, GitHub Actions
@@ -90,28 +90,35 @@ The project includes a GitHub Actions workflow that automatically deploys to a D
 ```
 summvideo/
 ├── .github/workflows/   # GitHub Actions workflow configurations
+├── backend-go/          # Golang backend application
+│   ├── handlers/        # HTTP request handlers
+│   ├── services/        # Business logic layer
+│   ├── models/          # Data structures
+│   ├── utils/           # Helper functions
+│   ├── Dockerfile       # Go service containerization
+│   ├── go.mod           # Go dependencies
+│   └── .env.example     # Example environment variables
 ├── frontend/            # Vue.js frontend application
 │   ├── src/             # Vue components and application logic
 │   ├── public/          # Static assets for Vue.js
 │   └── package.json     # Frontend dependencies
 ├── static/              # Static assets (CSS, JS)
 │   └── vue/             # Built Vue.js application (after build)
-├── templates/           # HTML templates (legacy)
+├── templates/           # HTML templates
 ├── .gitignore           # Git ignore file
 ├── docker-compose.yml   # Docker Compose configuration
-├── Dockerfile           # Docker build configuration
-├── main.py              # FastAPI application
 ├── README.md            # Project documentation
-└── requirements.txt     # Python dependencies
+└── CLAUDE.md            # Helper documentation for LLM assistants
 ```
 
 ## ⚙️ How It Works
 
 1. **Video Upload**: Users upload video files through the Vue.js interface
-2. **Audio Extraction**: FFmpeg extracts audio from the video
-3. **Transcription**: OpenAI's Whisper model transcribes the audio to text
-4. **Summarization**: OpenAI's GPT-4o-mini generates a summary based on the chosen prompt
-5. **Result Display**: The summary is rendered in markdown format in the Vue.js interface, with an option to view the full transcription
+2. **Concurrent Processing**: Go backend handles the request in a separate goroutine
+3. **Audio Extraction**: FFmpeg extracts audio from the video
+4. **Transcription**: OpenAI's Whisper model transcribes the audio to text
+5. **Summarization**: OpenAI's GPT-4o-mini generates a summary based on the chosen prompt
+6. **Result Display**: The summary is rendered in markdown format in the Vue.js interface, with an option to view the full transcription
 
 ## 📝 Logging
 
